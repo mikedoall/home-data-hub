@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeDataHub - Property Information Platform</title>
+  <style>
+    :root {
+      --primary: #4a6bff;
+      --primary-dark: #2541b2;
+      --background: #f7f9fc;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+      --border: #e5e7eb;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--background);
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    h1 { 
+      font-size: 2.5rem;
+      margin: 0;
+      font-weight: 800;
+    }
+    
+    .tagline {
+      font-weight: 300;
+      font-size: 1.2rem;
+      margin: 10px 0 0;
+    }
+    
+    .content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      margin: 20px auto;
+    }
+    
+    h2 {
+      color: var(--primary-dark);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    
+    h3 {
+      margin: 25px 0 15px;
+      color: var(--primary-dark);
+    }
+    
+    p {
+      margin-bottom: 15px;
+    }
+    
+    pre { 
+      background: #f4f4f4; 
+      padding: 15px; 
+      border-radius: 5px; 
+      overflow-x: auto;
+      border-left: 4px solid var(--primary);
+      margin-bottom: 20px;
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .card { 
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      border: 1px solid var(--border);
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .card-title {
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .property-address {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    
+    .property-location {
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+    
+    .property-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+    }
+    
+    .property-detail {
+      text-align: center;
+    }
+    
+    .detail-value {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+    .detail-label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    
+    .provider {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .provider-tech {
+      background: #f0f4ff;
+      color: var(--primary-dark);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+    
+    .provider-speed {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .provider-price {
+      font-weight: bold;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .button-outline {
+      background-color: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .button-outline:hover {
+      background-color: #f0f4ff;
+    }
+    
+    .search-container {
+      max-width: 600px;
+      margin: 20px auto;
+      display: flex;
+    }
+    
+    .search-input {
+      flex-grow: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 4px 0 0 4px;
+      font-size: 1rem;
+    }
+    
+    .search-button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      padding: 0 20px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .search-button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    #error-message {
+      background-color: #ffeeee;
+      border-left: 4px solid #ff4444;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    #results-container {
+      display: none;
+    }
+    
+    #property-details {
+      display: none;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      display: none;
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(74, 107, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .content { padding: 20px; }
+      .search-container { flex-direction: column; }
+      .search-input, .search-button {
+        border-radius: 4px;
+        width: 100%;
+      }
+      .search-button {
+        margin-top: 10px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HomeDataHub</h1>
+    <p class="tagline">Comprehensive Property Information Platform</p>
+  </header>
+  
+  <div class="container">
+    <div class="content">
+      <h2>Property Information Lookup</h2>
+      
+      <!-- Debug Panel -->
+      <div style="background-color: #f0f0f0; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc;">
+        <h3 style="margin-top: 0; color: #333;">Autocomplete API Debug</h3>
+        <div>
+          <input type="text" id="debug-query" placeholder="Test query (e.g. 'Rochester')" style="padding: 8px; width: 300px; margin-right: 10px;">
+          <button id="test-autocomplete" style="background-color: #4a6bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Test Autocomplete API</button>
+        </div>
+        <div id="debug-result" style="margin-top: 10px; font-size: 13px; max-height: 200px; overflow-y: auto;"></div>
+      </div>
+      
+      <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Enter address, city, or zip code..." minlength="3" onkeyup="if(event.key==='Enter') performSearch()">
+        <button id="search-button" class="search-button" onclick="performSearch()">Search</button>
+      </div>
+      
+      <div style="margin: 20px 0; text-align: center;">
+        <p>Quick Search: </p>
+        <button onclick="quickSearch('New York')" class="button">New York</button>
+        <button onclick="quickSearch('Dallas')" class="button">Dallas</button>
+        <button onclick="quickSearch('Los Angeles')" class="button">Los Angeles</button>
+      </div>
+      
+      <div id="error-message"></div>
+      
+      <div id="loading" class="loading">
+        <div class="loader"></div>
+        <p>Searching for properties...</p>
+      </div>
+      
+      <div id="results-container">
+        <h3>Search Results</h3>
+        <div id="results-list" class="card-grid"></div>
+      </div>
+      
+      <div id="property-details">
+        <h3>Property Details</h3>
+        <div id="property-info"></div>
+        
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-title">Internet Providers</div>
+            <div id="internet-providers"></div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Schools</div>
+            <div id="schools"></div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Utilities</div>
+            <div id="utilities"></div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px">
+          <button id="back-button" class="button button-outline">Back to Results</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content">
+      <h2>Sample Property Data</h2>
+      <p>This standalone HTML file contains preloaded sample data to demonstrate the HomeDataHub functionality.</p>
+      
+      <div class="card-grid">
+        <div class="card">
+          <div class="property-address">1234 Main St</div>
+          <div class="property-location">Dallas, TX 75001</div>
+          <div>Single Family Home</div>
+          <div class="property-details">
+            <div class="property-detail">
+              <div class="detail-value">4</div>
+              <div class="detail-label">Beds</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">2.5</div>
+              <div class="detail-label">Baths</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">2,400</div>
+              <div class="detail-label">SqFt</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">$450,000</div>
+              <div class="detail-label">Price</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="property-address">456 Park Ave</div>
+          <div class="property-location">New York, NY 10001</div>
+          <div>Apartment</div>
+          <div class="property-details">
+            <div class="property-detail">
+              <div class="detail-value">2</div>
+              <div class="detail-label">Beds</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">1</div>
+              <div class="detail-label">Baths</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">1,200</div>
+              <div class="detail-label">SqFt</div>
+            </div>
+            <div class="property-detail">
+              <div class="detail-value">$850,000</div>
+              <div class="detail-label">Price</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>&copy; 2025 HomeDataHub - A comprehensive property information platform</p>
+      <p>Standalone HTML Version</p>
+    </div>
+  </div>
+  
+  <script>
+    // Sample data for the standalone HTML version
+    const sampleData = {
+      properties: [
+        {
+          id: 1,
+          address: "1234 Main St",
+          city: "Dallas",
+          state: "TX",
+          zip: "75001",
+          latitude: 32.800578,
+          longitude: -96.710465,
+          propertyType: "Single Family",
+          sqft: 2400,
+          beds: 4,
+          baths: "2.5",
+          price: 450000,
+          lastUpdated: new Date().toISOString()
+        },
+        {
+          id: 2,
+          address: "456 Park Ave",
+          city: "New York",
+          state: "NY",
+          zip: "10001",
+          latitude: 40.7128,
+          longitude: -74.006,
+          propertyType: "Apartment",
+          sqft: 1200,
+          beds: 2,
+          baths: "1",
+          price: 850000,
+          lastUpdated: new Date().toISOString()
+        },
+        {
+          id: 3,
+          address: "789 Beach Blvd",
+          city: "Los Angeles",
+          state: "CA",
+          zip: "90001",
+          latitude: 34.0522,
+          longitude: -118.2437,
+          propertyType: "Condo",
+          sqft: 1500,
+          beds: 3,
+          baths: "2",
+          price: 650000,
+          lastUpdated: new Date().toISOString()
+        }
+      ],
+      internetProviders: [
+        {
+          id: 1,
+          propertyId: 1,
+          name: "AT&T Fiber",
+          technology: "Fiber",
+          maxDownload: 1000,
+          maxUpload: 1000,
+          startingPrice: "$55.00",
+          isAvailable: true
+        },
+        {
+          id: 2,
+          propertyId: 1,
+          name: "Spectrum",
+          technology: "Cable",
+          maxDownload: 400,
+          maxUpload: 20,
+          startingPrice: "$49.99",
+          isAvailable: true
+        },
+        {
+          id: 3,
+          propertyId: 2,
+          name: "Verizon Fios",
+          technology: "Fiber",
+          maxDownload: 940,
+          maxUpload: 880,
+          startingPrice: "$49.99",
+          isAvailable: true
+        },
+        {
+          id: 4,
+          propertyId: 3,
+          name: "Cox",
+          technology: "Cable",
+          maxDownload: 500,
+          maxUpload: 50,
+          startingPrice: "$59.99",
+          isAvailable: true
+        }
+      ],
+      schools: [
+        {
+          id: 1,
+          propertyId: 1,
+          name: "Washington Elementary",
+          type: "Elementary",
+          address: "1000 School Ave, Dallas, TX 75001",
+          district: "Dallas ISD",
+          rating: 8,
+          studentTeacherRatio: "18:1"
+        },
+        {
+          id: 2,
+          propertyId: 1,
+          name: "Lincoln Middle School",
+          type: "Middle",
+          address: "2000 School Blvd, Dallas, TX 75001",
+          district: "Dallas ISD",
+          rating: 7,
+          studentTeacherRatio: "20:1"
+        },
+        {
+          id: 3,
+          propertyId: 2,
+          name: "PS 111",
+          type: "Elementary",
+          address: "440 W 53rd St, New York, NY 10001",
+          district: "NYC DOE",
+          rating: 6,
+          studentTeacherRatio: "22:1"
+        },
+        {
+          id: 4,
+          propertyId: 3,
+          name: "Westwood Elementary",
+          type: "Elementary",
+          address: "2050 Selby Ave, Los Angeles, CA 90001",
+          district: "LAUSD",
+          rating: 9,
+          studentTeacherRatio: "19:1"
+        }
+      ],
+      utilities: [
+        {
+          id: 1,
+          propertyId: 1,
+          type: "Electric",
+          provider: "TXU Energy",
+          estimatedCostMin: 120,
+          estimatedCostMax: 220,
+          additionalInfo: "Variable rate plans available"
+        },
+        {
+          id: 2,
+          propertyId: 1,
+          type: "Water",
+          provider: "City of Dallas",
+          estimatedCostMin: 50,
+          estimatedCostMax: 80,
+          additionalInfo: "Billed quarterly"
+        },
+        {
+          id: 3,
+          propertyId: 2,
+          type: "Electric",
+          provider: "ConEdison",
+          estimatedCostMin: 160,
+          estimatedCostMax: 300,
+          additionalInfo: "Higher costs during summer months"
+        },
+        {
+          id: 4,
+          propertyId: 3,
+          type: "Electric",
+          provider: "LADWP",
+          estimatedCostMin: 140,
+          estimatedCostMax: 250,
+          additionalInfo: "Tiered rate structure"
+        }
+      ]
+    };
+    
+    // DOM elements
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const errorMessage = document.getElementById('error-message');
+    const loading = document.getElementById('loading');
+    const resultsContainer = document.getElementById('results-container');
+    const resultsList = document.getElementById('results-list');
+    const propertyDetails = document.getElementById('property-details');
+    const propertyInfo = document.getElementById('property-info');
+    const internetProviders = document.getElementById('internet-providers');
+    const schools = document.getElementById('schools');
+    const utilities = document.getElementById('utilities');
+    const backButton = document.getElementById('back-button');
+    
+    // Debug elements
+    const debugQuery = document.getElementById('debug-query');
+    const testAutocompleteButton = document.getElementById('test-autocomplete');
+    const debugResult = document.getElementById('debug-result');
+    
+    // Set up autocomplete debug test
+    testAutocompleteButton.addEventListener('click', async () => {
+      const query = debugQuery.value.trim();
+      if (!query || query.length < 3) {
+        debugResult.innerHTML = '<div style="color: red;">Please enter a query with at least 3 characters</div>';
+        return;
+      }
+      
+      debugResult.innerHTML = '<div>Testing autocomplete API with query: "' + query + '"...</div>';
+      
+      try {
+        const response = await fetch(`/api/autocomplete?q=${encodeURIComponent(query)}`);
+        const statusText = `<div>API Response Status: ${response.status} ${response.statusText}</div>`;
+        debugResult.innerHTML = statusText;
+        
+        const contentType = response.headers.get('content-type');
+        debugResult.innerHTML += `<div>Content-Type: ${contentType}</div>`;
+        
+        const responseText = await response.text();
+        
+        let resultHtml = statusText + '<div style="margin-top: 8px;">Raw Response:</div>';
+        resultHtml += `<pre style="background: #eee; padding: 8px; overflow-x: auto; max-height: 150px; font-size: 12px;">${responseText}</pre>`;
+        
+        try {
+          const data = JSON.parse(responseText);
+          resultHtml += '<div style="margin-top: 8px;">Parsed JSON:</div>';
+          resultHtml += `<pre style="background: #eee; padding: 8px; overflow-x: auto; max-height: 150px; font-size: 12px;">${JSON.stringify(data, null, 2)}</pre>`;
+          
+          if (data && data.success === true && Array.isArray(data.results)) {
+            resultHtml += `<div style="color: green; font-weight: bold; margin-top: 8px;">Success! Found ${data.results.length} suggestions</div>`;
+            
+            if (data.results.length > 0) {
+              resultHtml += '<ul style="margin-top: 8px; padding-left: 20px;">';
+              data.results.forEach(result => {
+                resultHtml += `<li>${result.formatted}</li>`;
+              });
+              resultHtml += '</ul>';
+            }
+          } else {
+            resultHtml += '<div style="color: orange; margin-top: 8px;">Response does not contain expected data format</div>';
+          }
+        } catch (parseError) {
+          resultHtml += `<div style="color: red; margin-top: 8px;">Failed to parse response as JSON: ${parseError.message}</div>`;
+        }
+        
+        debugResult.innerHTML = resultHtml;
+      } catch (error) {
+        debugResult.innerHTML = `<div style="color: red;">Error testing autocomplete API: ${error.message}</div>`;
+      }
+    });
+    
+    // Helper function to show error messages
+    function showError(message) {
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = message;
+    }
+    
+    // Quick search function for the direct search buttons
+    function quickSearch(term) {
+      console.log('Quick search for: ' + term);
+      if (searchInput) {
+        searchInput.value = term;
+      }
+      performSearch();
+    }
+    
+    // Search functionality
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+      
+      // Test autocomplete on typing
+      const query = searchInput.value.trim();
+      if (query.length >= 3) {
+        // Use the debounced version to avoid too many API calls
+        debouncedTestAutocomplete(query);
+      }
+    });
+    
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Create debounced version of testAutocomplete
+    const debouncedTestAutocomplete = debounce(testAutocomplete, 300);
+    
+    // Function to test autocomplete API
+    async function testAutocomplete(query) {
+      console.log(`Testing autocomplete with: "${query}"`);
+      
+      try {
+        const response = await fetch(`/api/autocomplete?q=${encodeURIComponent(query)}`);
+        console.log(`Autocomplete API response status: ${response.status}`);
+        
+        if (!response.ok) {
+          console.error(`Autocomplete API error: ${response.status}`);
+          return;
+        }
+        
+        const data = await response.json();
+        console.log('Autocomplete API response:', data);
+        
+        if (data && data.success && Array.isArray(data.results)) {
+          console.log(`Autocomplete found ${data.results.length} suggestions`);
+          
+          // You could show suggestions in a UI element here
+          // For now, just logging to console
+          data.results.forEach(result => {
+            console.log(`- ${result.formatted}`);
+          });
+        }
+      } catch (error) {
+        console.error('Error testing autocomplete:', error);
+      }
+    }
+    
+    backButton.addEventListener('click', () => {
+      propertyDetails.style.display = 'none';
+      resultsContainer.style.display = 'block';
+    });
+    
+    // Function to fetch real broadband data from our API
+    async function fetchBroadbandData(lat, lng) {
+      try {
+        console.log(`Fetching broadband data for coordinates: lat=${lat}, lng=${lng}`);
+        const url = `/api/broadband-data?lat=${lat}&lng=${lng}`;
+        console.log(`API URL: ${url}`);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          console.error(`API returned status: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch broadband data: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Broadband data received:', data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching broadband data:', error);
+        return null;
+      }
+    }
+    
+    function performSearch() {
+      console.log("performSearch function called");
+      const query = searchInput.value.trim();
+      console.log("Search query:", query);
+      
+      // Reset UI
+      errorMessage.style.display = 'none';
+      resultsContainer.style.display = 'none';
+      propertyDetails.style.display = 'none';
+      
+      // Validate query
+      if (query.length < 3) {
+        console.log("Query too short");
+        showError('Please enter at least 3 characters for search');
+        return;
+      }
+      
+      // Show loading
+      loading.style.display = 'block';
+      
+      // Try to fetch from the API first
+      fetch(`/api/properties/search?q=${encodeURIComponent(query)}`)
+        .then(response => {
+          console.log("API response status:", response.status);
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(apiResults => {
+          console.log("API search results:", apiResults);
+          
+          // Hide loading
+          loading.style.display = 'none';
+          
+          // Process the API results based on format
+          let resultsToDisplay = [];
+          
+          if (apiResults && apiResults.success === true && Array.isArray(apiResults.results)) {
+            // New API format with results property
+            console.log("Found API results in data.results:", apiResults.results.length);
+            resultsToDisplay = apiResults.results;
+          } else if (Array.isArray(apiResults)) {
+            // Old API format (direct array)
+            console.log("Found API results in direct array:", apiResults.length);
+            resultsToDisplay = apiResults;
+          } else {
+            console.log("Unknown API response format");
+          }
+          
+          if (resultsToDisplay && resultsToDisplay.length > 0) {
+            // We have results from the API, use them
+            console.log("Displaying", resultsToDisplay.length, "API results");
+            displaySearchResults(resultsToDisplay);
+          } else {
+            // Fall back to sample data if API returns empty
+            console.log("No API results, falling back to sample data");
+            const results = searchProperties(query);
+            console.log("Sample data search results:", results);
+            
+            if (results.length === 0) {
+              console.log("No results found for query:", query);
+              showError('No properties found matching your search criteria');
+              return;
+            }
+            
+            // Display results from sample data
+            console.log("Displaying", results.length, "sample results");
+            displaySearchResults(results);
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching from API:", error);
+          
+          // Fall back to sample data on error
+          console.log("API error, falling back to sample data");
+          const results = searchProperties(query);
+          
+          // Hide loading
+          loading.style.display = 'none';
+          
+          if (results.length === 0) {
+            console.log("No results found for query:", query);
+            showError('No properties found matching your search criteria');
+            return;
+          }
+          
+          // Display results from sample data
+          console.log("Displaying", results.length, "sample results");
+          displaySearchResults(results);
+        });
+    }
+    
+    function searchProperties(query) {
+      query = query.toLowerCase();
+      console.log("Searching with lowercase query:", query);
+      
+      // For debugging, let's check each property individually
+      sampleData.properties.forEach(property => {
+        const addressMatch = property.address.toLowerCase().includes(query);
+        const cityMatch = property.city.toLowerCase().includes(query);
+        const stateMatch = property.state.toLowerCase().includes(query);
+        const zipMatch = property.zip.toLowerCase().includes(query);
+        
+        console.log(`Property ${property.id}:`, {
+          address: property.address,
+          city: property.city,
+          state: property.state,
+          zip: property.zip,
+          matches: {
+            address: addressMatch,
+            city: cityMatch,
+            state: stateMatch,
+            zip: zipMatch,
+            anyMatch: addressMatch || cityMatch || stateMatch || zipMatch
+          }
+        });
+      });
+      
+      return sampleData.properties.filter(property => 
+        property.address.toLowerCase().includes(query) ||
+        property.city.toLowerCase().includes(query) ||
+        property.state.toLowerCase().includes(query) ||
+        property.zip.toLowerCase().includes(query)
+      );
+    }
+    
+    function displaySearchResults(properties) {
+      resultsList.innerHTML = '';
+      
+      properties.forEach(property => {
+        const propertyCard = document.createElement('div');
+        propertyCard.className = 'card';
+        propertyCard.innerHTML = `
+          <div class="property-address">${property.address}</div>
+          <div class="property-location">${property.city}, ${property.state} ${property.zip}</div>
+          <div>${property.propertyType || 'Residential Property'}</div>
+          <div class="property-details">
+            ${property.beds ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.beds}</div>
+                <div class="detail-label">Beds</div>
+              </div>
+            ` : ''}
+            ${property.baths ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.baths}</div>
+                <div class="detail-label">Baths</div>
+              </div>
+            ` : ''}
+            ${property.sqft ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.sqft.toLocaleString()}</div>
+                <div class="detail-label">SqFt</div>
+              </div>
+            ` : ''}
+            ${property.price ? `
+              <div class="property-detail">
+                <div class="detail-value">$${property.price.toLocaleString()}</div>
+                <div class="detail-label">Price</div>
+              </div>
+            ` : ''}
+          </div>
+          <div style="margin-top: 15px; text-align: right;">
+            <button class="button view-details" data-id="${property.id}">View Details</button>
+          </div>
+        `;
+        
+        resultsList.appendChild(propertyCard);
+      });
+      
+      // Add event listeners to view details buttons
+      document.querySelectorAll('.view-details').forEach(button => {
+        button.addEventListener('click', () => {
+          const propertyId = parseInt(button.getAttribute('data-id'));
+          
+          // Get the property from search results - more reliable than making a new request
+          const property = properties.find(p => p.id === propertyId);
+          
+          if (property) {
+            console.log("Using property from search results:", property);
+            // Pass the property object directly to avoid making another API request
+            usePropertyFromResults(property);
+          } else {
+            // If not found in results (shouldn't happen), fall back to the API
+            showPropertyDetails(propertyId);
+          }
+        });
+      });
+      
+      // Function to display property from search results
+      function usePropertyFromResults(property) {
+        // Show loading while preparing the view
+        loading.style.display = 'block';
+        propertyDetails.style.display = 'none';
+        
+        // Build a data object similar to what we'd get from the API
+        const data = {
+          property: property,
+          internetProviders: [], // We'll use the property's broadband data
+          schools: [],
+          utilities: []
+        };
+        
+        // Use the same display function we use for API results
+        setTimeout(() => {
+          loading.style.display = 'none';
+          displayFullPropertyData(data);
+        }, 300);
+      }
+      
+      resultsContainer.style.display = 'block';
+    }
+    
+    function showPropertyDetails(propertyId) {
+      // Show loading
+      loading.style.display = 'block';
+      propertyDetails.style.display = 'none';
+      
+      // Try to fetch from API first
+      fetch(`/api/property-full/${propertyId}`)
+        .then(response => {
+          if (!response.ok) {
+            console.log(`API error fetching property ${propertyId}: ${response.status}`);
+            throw new Error('API error');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Hide loading
+          loading.style.display = 'none';
+          
+          if (data && data.property) {
+            console.log("Using API data for property details", data);
+            displayFullPropertyData(data);
+          } else {
+            // Fall back to sample data if API returns empty
+            console.log("No API property data, falling back to sample data");
+            useLocalPropertyData(propertyId);
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching property from API:", error);
+          // Fall back to sample data
+          console.log("API error, falling back to sample data");
+          useLocalPropertyData(propertyId);
+        });
+      
+      // Helper function to use local data
+      function useLocalPropertyData(propertyId) {
+        // Hide loading
+        loading.style.display = 'none';
+        
+        const property = sampleData.properties.find(p => p.id === propertyId);
+        
+        if (!property) {
+          showError('Property not found');
+          return;
+        }
+        
+        // Display property info
+        propertyInfo.innerHTML = `
+          <div class="card">
+            <div class="property-address">${property.address}</div>
+            <div class="property-location">${property.city}, ${property.state} ${property.zip}</div>
+            <div style="margin: 10px 0">
+              ${property.propertyType || 'Residential Property'}
+            </div>
+            <div class="property-details">
+              ${property.beds ? `
+                <div class="property-detail">
+                  <div class="detail-value">${property.beds}</div>
+                  <div class="detail-label">Beds</div>
+                </div>
+              ` : ''}
+              ${property.baths ? `
+                <div class="property-detail">
+                  <div class="detail-value">${property.baths}</div>
+                  <div class="detail-label">Baths</div>
+                </div>
+              ` : ''}
+              ${property.sqft ? `
+                <div class="property-detail">
+                  <div class="detail-value">${property.sqft.toLocaleString()}</div>
+                  <div class="detail-label">SqFt</div>
+                </div>
+              ` : ''}
+              ${property.price ? `
+                <div class="property-detail">
+                  <div class="detail-value">$${property.price.toLocaleString()}</div>
+                  <div class="detail-label">Price</div>
+                </div>
+              ` : ''}
+            </div>
+            <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+              Last updated: ${new Date(property.lastUpdated).toLocaleDateString()}
+            </div>
+          </div>
+        `;
+        
+        // Display internet providers
+        const providers = sampleData.internetProviders.filter(p => p.propertyId === propertyId);
+        
+        if (property && property.latitude && property.longitude) {
+          // Use real API data if available
+          try {
+            // Show loading state
+            internetProviders.innerHTML = '<div class="loading" style="display:block"><div class="loader"></div><p>Loading internet provider data...</p></div>';
+            
+            fetchBroadbandData(property.latitude, property.longitude)
+              .then(data => {
+                if (data && data.providers && data.providers.length > 0) {
+                  // Format the real provider data
+                  internetProviders.innerHTML = data.providers.map(provider => `
+                    <div class="provider">
+                      <div>
+                        <div style="font-weight: bold;">${provider.name}</div>
+                        <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                      </div>
+                      <div style="text-align: right">
+                        <div class="provider-tech">${provider.technologies ? provider.technologies.join(', ') : 'Unknown'}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-light);">${provider.source || 'FCC Data'}</div>
+                      </div>
+                    </div>
+                  `).join('');
+                } else {
+                  // Fall back to sample data if real API call fails
+                  if (providers.length > 0) {
+                    internetProviders.innerHTML = providers.map(provider => `
+                      <div class="provider">
+                        <div>
+                          <div style="font-weight: bold;">${provider.name}</div>
+                          <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                        </div>
+                        <div style="text-align: right">
+                          <div class="provider-price">${provider.startingPrice}/mo</div>
+                          <span class="provider-tech">${provider.technology}</span>
+                        </div>
+                      </div>
+                    `).join('');
+                  } else {
+                    internetProviders.innerHTML = '<p>No internet provider data available</p>';
+                  }
+                }
+              })
+              .catch(error => {
+                console.error('Error in broadband data promise:', error);
+                // Fall back to sample data
+                if (providers.length > 0) {
+                  internetProviders.innerHTML = providers.map(provider => `
+                    <div class="provider">
+                      <div>
+                        <div style="font-weight: bold;">${provider.name}</div>
+                        <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                      </div>
+                      <div style="text-align: right">
+                        <div class="provider-price">${provider.startingPrice}/mo</div>
+                        <span class="provider-tech">${provider.technology}</span>
+                      </div>
+                    </div>
+                  `).join('');
+                } else {
+                  internetProviders.innerHTML = '<p>No internet provider data available</p>';
+                }
+              });
+          } catch (e) {
+            console.error('Error initializing broadband data fetch:', e);
+            // Use sample data as fallback
+            if (providers.length > 0) {
+              internetProviders.innerHTML = providers.map(provider => `
+                <div class="provider">
+                  <div>
+                    <div style="font-weight: bold;">${provider.name}</div>
+                    <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                  </div>
+                  <div style="text-align: right">
+                    <div class="provider-price">${provider.startingPrice}/mo</div>
+                    <span class="provider-tech">${provider.technology}</span>
+                  </div>
+                </div>
+              `).join('');
+            } else {
+              internetProviders.innerHTML = '<p>No internet provider data available</p>';
+            }
+          }
+        } else {
+          // No coordinates available, use sample data
+          if (providers.length > 0) {
+            internetProviders.innerHTML = providers.map(provider => `
+              <div class="provider">
+                <div>
+                  <div style="font-weight: bold;">${provider.name}</div>
+                  <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                </div>
+                <div style="text-align: right">
+                  <div class="provider-price">${provider.startingPrice}/mo</div>
+                  <span class="provider-tech">${provider.technology}</span>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            internetProviders.innerHTML = '<p>No internet provider data available</p>';
+          }
+        }
+        
+        // Display schools
+        const propertySchools = sampleData.schools.filter(s => s.propertyId === propertyId);
+        if (propertySchools.length > 0) {
+          schools.innerHTML = propertySchools.map(school => `
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold;">${school.name}</div>
+              <div>${school.type} • ${school.district}</div>
+              <div>Rating: ${school.rating}/10 • Student/Teacher Ratio: ${school.studentTeacherRatio}</div>
+              <div style="font-size: 0.9rem; color: var(--text-light);">${school.address}</div>
+            </div>
+          `).join('');
+        } else {
+          schools.innerHTML = '<p>No school data available</p>';
+        }
+        
+        // Display utilities
+        const propertyUtilities = sampleData.utilities.filter(u => u.propertyId === propertyId);
+        if (propertyUtilities.length > 0) {
+          utilities.innerHTML = propertyUtilities.map(utility => `
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold;">${utility.type}</div>
+              <div>${utility.provider}</div>
+              <div>Estimated Monthly Cost: $${utility.estimatedCostMin} - $${utility.estimatedCostMax}</div>
+              <div style="font-size: 0.9rem; color: var(--text-light);">
+                ${utility.additionalInfo || ''}
+              </div>
+            </div>
+          `).join('');
+        } else {
+          utilities.innerHTML = '<p>No utility data available</p>';
+        }
+        
+        resultsContainer.style.display = 'none';
+        propertyDetails.style.display = 'block';
+      }
+    }
+    
+    // Function to display full property data from API
+    function displayFullPropertyData(data) {
+      const property = data.property;
+      
+      console.log("Display property full data:", property);
+      
+      // Display property info
+      propertyInfo.innerHTML = `
+        <div class="card">
+          <div class="property-address">${property.address}</div>
+          <div class="property-location">${property.city}, ${property.state} ${property.zip}</div>
+          <div style="margin: 10px 0">
+            ${property.propertyType || 'Residential Property'}
+          </div>
+          <div class="property-details">
+            ${property.beds ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.beds}</div>
+                <div class="detail-label">Beds</div>
+              </div>
+            ` : ''}
+            ${property.baths ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.baths}</div>
+                <div class="detail-label">Baths</div>
+              </div>
+            ` : ''}
+            ${property.sqft ? `
+              <div class="property-detail">
+                <div class="detail-value">${property.sqft.toLocaleString()}</div>
+                <div class="detail-label">SqFt</div>
+              </div>
+            ` : ''}
+            ${property.price ? `
+              <div class="property-detail">
+                <div class="detail-value">$${property.price.toLocaleString()}</div>
+                <div class="detail-label">Price</div>
+              </div>
+            ` : ''}
+          </div>
+          <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+            Last updated: ${new Date(property.lastUpdated).toLocaleDateString()}
+          </div>
+        </div>
+      `;
+      
+      // First check if the property has embedded broadband data
+      if (property.broadbandData && property.broadbandData.providers && property.broadbandData.providers.length > 0) {
+        console.log("Using broadband data from property object:", property.broadbandData);
+        
+        internetProviders.innerHTML = property.broadbandData.providers.map(provider => `
+          <div class="provider">
+            <div>
+              <div style="font-weight: bold;">${provider.name}</div>
+              <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+            </div>
+            <div style="text-align: right">
+              <div class="provider-tech">${provider.technologies ? provider.technologies.join(', ') : 'Unknown'}</div>
+              <div style="font-size: 0.8rem; color: var(--text-light);">${provider.source || 'FCC Data'}</div>
+            </div>
+          </div>
+        `).join('');
+        
+        // Add source information
+        if (property.broadbandData.source) {
+          internetProviders.innerHTML += `
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-light);">
+              Source: ${property.broadbandData.source}
+              ${property.broadbandData.message ? ` - ${property.broadbandData.message}` : ''}
+            </div>
+          `;
+        }
+      }
+      // Display internet providers from API (legacy support)
+      else if (data.internetProviders && data.internetProviders.length > 0) {
+        internetProviders.innerHTML = data.internetProviders.map(provider => `
+          <div class="provider">
+            <div>
+              <div style="font-weight: bold;">${provider.name}</div>
+              <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+            </div>
+            <div style="text-align: right">
+              <div class="provider-price">${provider.startingPrice || ''}</div>
+              <span class="provider-tech">${provider.technology || ''}</span>
+            </div>
+          </div>
+        `).join('');
+      } else if (property.latitude && property.longitude) {
+        // Try to get broadband data if we have coordinates
+        internetProviders.innerHTML = '<div class="loading" style="display:block"><div class="loader"></div><p>Loading internet provider data...</p></div>';
+        
+        fetchBroadbandData(property.latitude, property.longitude)
+          .then(data => {
+            if (data && data.providers && data.providers.length > 0) {
+              // Format the real provider data
+              internetProviders.innerHTML = data.providers.map(provider => `
+                <div class="provider">
+                  <div>
+                    <div style="font-weight: bold;">${provider.name}</div>
+                    <div class="provider-speed">${provider.maxDownload} Mbps download / ${provider.maxUpload} Mbps upload</div>
+                  </div>
+                  <div style="text-align: right">
+                    <div class="provider-tech">${provider.technologies ? provider.technologies.join(', ') : 'Unknown'}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-light);">${provider.source || 'FCC Data'}</div>
+                  </div>
+                </div>
+              `).join('');
+            } else {
+              internetProviders.innerHTML = '<p>No internet provider data available</p>';
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching broadband data:', error);
+            internetProviders.innerHTML = '<p>Error loading internet provider data</p>';
+          });
+      } else {
+        internetProviders.innerHTML = '<p>No internet provider data available</p>';
+      }
+      
+      // Display schools from API
+      if (data.schools && data.schools.length > 0) {
+        schools.innerHTML = data.schools.map(school => `
+          <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold;">${school.name}</div>
+            <div>${school.type} • ${school.district}</div>
+            <div>Rating: ${school.rating}/10 • Student/Teacher Ratio: ${school.studentTeacherRatio}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">${school.address}</div>
+          </div>
+        `).join('');
+      } else {
+        schools.innerHTML = '<p>No school data available</p>';
+      }
+      
+      // Display utilities from API
+      if (data.utilities && data.utilities.length > 0) {
+        utilities.innerHTML = data.utilities.map(utility => `
+          <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold;">${utility.type}</div>
+            <div>${utility.provider}</div>
+            <div>Estimated Monthly Cost: $${utility.estimatedCostMin} - $${utility.estimatedCostMax}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">
+              ${utility.additionalInfo || ''}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        utilities.innerHTML = '<p>No utility data available</p>';
+      }
+      
+      // Show the property details
+      resultsContainer.style.display = 'none';
+      propertyDetails.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCC Broadband Map Data Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    .container {
+      max-width: 960px;
+    }
+    .results-container {
+      margin-top: 20px;
+    }
+    #resultsJson {
+      font-family: monospace;
+      white-space: pre-wrap;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .test-card {
+      margin-bottom: 20px;
+      border: 1px solid rgba(0,0,0,0.125);
+      border-radius: 0.25rem;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FCC Broadband Map Data Test</h1>
+
+    <div class="test-card">
+      <h2>Step 1: Test Census Geocoding API</h2>
+      <p>Get the GEOID (blockcode) for your address</p>
+      <div class="mb-3">
+        <label for="addressInput" class="form-label">Enter an Address:</label>
+        <input type="text" class="form-control" id="addressInput" placeholder="e.g. 18008 Gawthrop Drive, Bradenton, FL 34211">
+      </div>
+      <button class="btn btn-primary" id="geocodeButton">Get Census Block</button>
+      <div id="censusResults" class="results-container">
+        <!-- Census API Results will appear here -->
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h2>Step 2: Query FCC Dataset with Blockcode</h2>
+      <p>Use the GEOID (blockcode) from Step 1 to query the FCC Broadband Map dataset</p>
+      <div class="mb-3">
+        <label for="blockcodeInput" class="form-label">Census Block ID (GEOID):</label>
+        <input type="text" class="form-control" id="blockcodeInput" placeholder="e.g. 120810020201003">
+      </div>
+      <button class="btn btn-primary" id="queryFccButton">Query FCC Dataset</button>
+      <div id="fccResults" class="results-container">
+        <!-- FCC API Results will appear here -->
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h2>Step 3: Direct FCC Lookup Test</h2>
+      <p>Try a direct lookup to compare with our API's response</p>
+      <div id="directUrl" class="mb-3">
+        <code>No blockcode entered yet</code>
+      </div>
+      <button class="btn btn-secondary" id="openDirectButton" disabled>Open in New Tab</button>
+    </div>
+    
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // References to DOM elements
+      const addressInput = document.getElementById('addressInput');
+      const geocodeButton = document.getElementById('geocodeButton');
+      const censusResults = document.getElementById('censusResults');
+      
+      const blockcodeInput = document.getElementById('blockcodeInput');
+      const queryFccButton = document.getElementById('queryFccButton');
+      const fccResults = document.getElementById('fccResults');
+      
+      const directUrl = document.getElementById('directUrl');
+      const openDirectButton = document.getElementById('openDirectButton');
+
+      // Update direct URL when blockcode changes
+      blockcodeInput.addEventListener('input', function() {
+        const blockcode = blockcodeInput.value.trim();
+        if (blockcode) {
+          const url = `https://opendata.fcc.gov/resource/jdr4-3q4p.json?blockcode=${blockcode}`;
+          directUrl.innerHTML = `<code>${url}</code>`;
+          openDirectButton.disabled = false;
+          openDirectButton.onclick = () => window.open(url, '_blank');
+        } else {
+          directUrl.innerHTML = `<code>No blockcode entered yet</code>`;
+          openDirectButton.disabled = true;
+        }
+      });
+
+      // Census geocoding - get blockcode for address
+      geocodeButton.addEventListener('click', async function() {
+        const address = addressInput.value.trim();
+        if (!address) {
+          censusResults.innerHTML = '<div class="alert alert-danger">Please enter an address</div>';
+          return;
+        }
+
+        censusResults.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        try {
+          const response = await fetch(`/api/census/geocode-address?address=${encodeURIComponent(address)}`);
+          const data = await response.json();
+          
+          if (data.success && data.blockInfo) {
+            censusResults.innerHTML = `
+              <div class="alert alert-success">
+                <h4>Successfully geocoded address!</h4>
+                <p><strong>GEOID/Blockcode:</strong> ${data.blockInfo.geoid}</p>
+                <p><strong>Location:</strong> ${data.blockInfo.latitude}, ${data.blockInfo.longitude}</p>
+                <p><strong>Census Info:</strong> State ${data.blockInfo.state}, County ${data.blockInfo.county}, Tract ${data.blockInfo.tract}, Block ${data.blockInfo.block}</p>
+                ${data.blockInfo.openCageAddress ? `<p><strong>Formatted Address:</strong> ${data.blockInfo.openCageAddress}</p>` : ''}
+              </div>
+              <button class="btn btn-outline-primary" id="useThisBlockcode">Use this Blockcode for FCC Query</button>
+            `;
+            
+            // Auto-fill the blockcode input
+            blockcodeInput.value = data.blockInfo.geoid;
+            // Trigger the input event to update the direct URL
+            blockcodeInput.dispatchEvent(new Event('input'));
+            
+            // Add event listener to the "Use this Blockcode" button
+            document.getElementById('useThisBlockcode').addEventListener('click', function() {
+              blockcodeInput.value = data.blockInfo.geoid;
+              blockcodeInput.dispatchEvent(new Event('input'));
+              // Scroll to the FCC query section
+              document.querySelector('h2:contains("Step 2")').scrollIntoView({ behavior: 'smooth' });
+            });
+          } else {
+            censusResults.innerHTML = `
+              <div class="alert alert-danger">
+                <h4>Geocoding failed</h4>
+                <p>${data.error || 'Unknown error'}</p>
+              </div>
+            `;
+          }
+        } catch (error) {
+          censusResults.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error</h4>
+              <p>${error.message}</p>
+            </div>
+          `;
+        }
+      });
+
+      // Query FCC dataset with blockcode
+      queryFccButton.addEventListener('click', async function() {
+        const blockcode = blockcodeInput.value.trim();
+        if (!blockcode) {
+          fccResults.innerHTML = '<div class="alert alert-danger">Please enter a Census Block ID (GEOID)</div>';
+          return;
+        }
+
+        fccResults.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        try {
+          const response = await fetch(`/api/broadband-data?blockcode=${encodeURIComponent(blockcode)}`);
+          const data = await response.json();
+          
+          // Format the JSON response for display
+          const formattedJson = JSON.stringify(data, null, 2);
+          
+          fccResults.innerHTML = `
+            <div class="alert ${data.providers && data.providers.length > 0 ? 'alert-success' : 'alert-warning'}">
+              <h4>${data.providers && data.providers.length > 0 ? 'Found Providers!' : 'No providers found'}</h4>
+              <p><strong>Source:</strong> ${data.source || 'Unknown'}</p>
+              <p><strong>Blockcode:</strong> ${data.blockcode || blockcode}</p>
+              ${data.coordinates ? `<p><strong>Coordinates:</strong> ${data.coordinates.latitude}, ${data.coordinates.longitude}</p>` : ''}
+              <p><strong>Provider Count:</strong> ${data.providers ? data.providers.length : 0}</p>
+            </div>
+            <div>
+              <h5>Full Response:</h5>
+              <pre id="resultsJson">${formattedJson}</pre>
+            </div>
+          `;
+        } catch (error) {
+          fccResults.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error</h4>
+              <p>${error.message}</p>
+            </div>
+          `;
+        }
+      });
+
+      // Helper function for querySelector
+      Element.prototype.contains = function(text) {
+        return this.textContent.includes(text);
+      };
+    });
+  </script>
+</body>
+</html>

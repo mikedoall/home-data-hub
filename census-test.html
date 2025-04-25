@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Census API Test | HomeDataHub</title>
+  <style>
+    :root {
+      --primary: #4a6bff;
+      --primary-dark: #3a5bef;
+      --background: #f9fafc;
+      --card: #ffffff;
+      --text: #1a1c21;
+      --text-light: #666a73;
+      --border: #e0e4e8;
+      --radius: 8px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tagline {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    nav {
+      background-color: white;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      margin: 0 0.25rem;
+      transition: background-color 0.2s;
+    }
+    
+    nav a:hover {
+      background-color: rgba(74, 107, 255, 0.1);
+    }
+    
+    nav a.active {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    .content {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-dark);
+    }
+    
+    .section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input[type="text"], 
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .result {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background-color: #f5f7ff;
+      border-radius: var(--radius);
+      border-left: 4px solid var(--primary);
+      display: none;
+    }
+    
+    .error {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background-color: #ffeeee;
+      border-radius: var(--radius);
+      border-left: 4px solid #ff4444;
+      display: none;
+    }
+    
+    pre {
+      background-color: #f1f3f5;
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    
+    .loading {
+      display: none;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(74, 107, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .map-container {
+      height: 300px;
+      border-radius: var(--radius);
+      margin-top: 1.5rem;
+      background-color: #eef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+    }
+    
+    .card-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--primary-dark);
+    }
+    
+    .info-item {
+      margin-bottom: 0.75rem;
+      display: flex;
+    }
+    
+    .info-label {
+      font-weight: 500;
+      width: 100px;
+      flex-shrink: 0;
+    }
+    
+    .info-value {
+      flex-grow: 1;
+    }
+    
+    .info-secondary {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .tagline {
+        font-size: 1rem;
+      }
+      
+      .content {
+        padding: 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HomeDataHub</h1>
+    <p class="tagline">Comprehensive Property Information Platform</p>
+  </header>
+  
+  <nav>
+    <a href="/">Home</a>
+    <a href="/fcc-broadband.html">FCC Broadband Test</a>
+    <a href="/census-test.html" class="active">Census API Test</a>
+  </nav>
+  
+  <div class="container">
+    <div class="content">
+      <h2>Census API Geocoding Test</h2>
+      <p>Test the Census API geocoding functionality by entering coordinates or an address to retrieve Census Block information.</p>
+      
+      <div class="section">
+        <h3>Geocode by Coordinates</h3>
+        <p>Convert latitude and longitude to Census Block information.</p>
+        
+        <div class="form-group">
+          <label for="latitude">Latitude:</label>
+          <input type="number" id="latitude" placeholder="e.g. 40.7128" step="0.0001" min="-90" max="90">
+        </div>
+        
+        <div class="form-group">
+          <label for="longitude">Longitude:</label>
+          <input type="number" id="longitude" placeholder="e.g. -74.006" step="0.0001" min="-180" max="180">
+        </div>
+        
+        <button onclick="geocodeCoordinates()">Get Census Block</button>
+        
+        <div id="coordinates-loading" class="loading">
+          <div class="loader"></div>
+          <p>Loading...</p>
+        </div>
+        
+        <div id="coordinates-error" class="error"></div>
+        
+        <div id="coordinates-result" class="result">
+          <h4>Census Block Information</h4>
+          <pre id="coordinates-json"></pre>
+          
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-title">Block Details</div>
+              <div class="info-item">
+                <div class="info-label">GEOID:</div>
+                <div id="coord-geoid" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">State:</div>
+                <div id="coord-state" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">County:</div>
+                <div id="coord-county" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Tract:</div>
+                <div id="coord-tract" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Block:</div>
+                <div id="coord-block" class="info-value"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h3>Geocode by Address</h3>
+        <p>Convert a street address to Census Block information.</p>
+        
+        <div class="form-group">
+          <label for="address">Street Address:</label>
+          <input type="text" id="address" placeholder="e.g. 1600 Pennsylvania Ave, Washington DC">
+        </div>
+        
+        <button onclick="geocodeAddress()">Get Census Block</button>
+        
+        <div id="address-loading" class="loading">
+          <div class="loader"></div>
+          <p>Loading...</p>
+        </div>
+        
+        <div id="address-error" class="error"></div>
+        
+        <div id="address-result" class="result">
+          <h4>Census Block Information</h4>
+          <pre id="address-json"></pre>
+          
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-title">Block Details</div>
+              <div class="info-item">
+                <div class="info-label">GEOID:</div>
+                <div id="addr-geoid" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">State:</div>
+                <div id="addr-state" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">County:</div>
+                <div id="addr-county" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Tract:</div>
+                <div id="addr-tract" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Block:</div>
+                <div id="addr-block" class="info-value"></div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Coordinates:</div>
+                <div id="addr-coords" class="info-value"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h3>About Census Blocks</h3>
+        <p>Census blocks are the smallest geographic area for which the Census Bureau publishes data. They are statistical areas bounded by visible features like streets, roads, and streams, as well as by nonvisible boundaries like property lines and city limits. A census block is typically the size of a city block in urban areas but can be much larger in rural areas.</p>
+        
+        <p>The GEOID (Geographic Identifier) is a unique code that identifies each census block, and it is structured as follows:</p>
+        <pre>STATE (2 digits) + COUNTY (3 digits) + TRACT (6 digits) + BLOCK (4 digits)</pre>
+        
+        <p>For example, a GEOID might look like: 131210119013024</p>
+        
+        <p>This information is useful for a variety of purposes, including mapping broadband availability data from the FCC and analyzing demographic information for specific locations.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function geocodeCoordinates() {
+      const latitude = document.getElementById('latitude').value;
+      const longitude = document.getElementById('longitude').value;
+      
+      if (!latitude || !longitude) {
+        showError('coordinates', 'Both latitude and longitude are required.');
+        return;
+      }
+      
+      showLoading('coordinates');
+      hideError('coordinates');
+      hideResult('coordinates');
+      
+      try {
+        const response = await fetch(`/api/census/geocode-coordinates?latitude=${latitude}&longitude=${longitude}`);
+        const data = await response.json();
+        
+        if (!response.ok || !data.success) {
+          showError('coordinates', data.error || 'An error occurred while fetching census data.');
+          hideLoading('coordinates');
+          return;
+        }
+        
+        // Display the result
+        document.getElementById('coordinates-json').textContent = JSON.stringify(data, null, 2);
+        
+        // Fill in the details
+        if (data.blockInfo) {
+          document.getElementById('coord-geoid').textContent = data.blockInfo.geoid;
+          document.getElementById('coord-state').textContent = data.blockInfo.state;
+          document.getElementById('coord-county').textContent = data.blockInfo.county;
+          document.getElementById('coord-tract').textContent = data.blockInfo.tract;
+          document.getElementById('coord-block').textContent = data.blockInfo.block;
+        }
+        
+        showResult('coordinates');
+      } catch (error) {
+        showError('coordinates', `Network error: ${error.message}`);
+      } finally {
+        hideLoading('coordinates');
+      }
+    }
+    
+    async function geocodeAddress() {
+      const address = document.getElementById('address').value;
+      
+      if (!address) {
+        showError('address', 'An address is required.');
+        return;
+      }
+      
+      showLoading('address');
+      hideError('address');
+      hideResult('address');
+      
+      try {
+        const response = await fetch(`/api/census/geocode-address?address=${encodeURIComponent(address)}`);
+        const data = await response.json();
+        
+        if (!response.ok || !data.success) {
+          showError('address', data.error || 'An error occurred while fetching census data.');
+          hideLoading('address');
+          return;
+        }
+        
+        // Display the result
+        document.getElementById('address-json').textContent = JSON.stringify(data, null, 2);
+        
+        // Fill in the details
+        if (data.blockInfo) {
+          document.getElementById('addr-geoid').textContent = data.blockInfo.geoid;
+          document.getElementById('addr-state').textContent = data.blockInfo.state;
+          document.getElementById('addr-county').textContent = data.blockInfo.county;
+          document.getElementById('addr-tract').textContent = data.blockInfo.tract;
+          document.getElementById('addr-block').textContent = data.blockInfo.block;
+          document.getElementById('addr-coords').textContent = 
+            `${data.blockInfo.latitude.toFixed(6)}, ${data.blockInfo.longitude.toFixed(6)}`;
+        }
+        
+        showResult('address');
+      } catch (error) {
+        showError('address', `Network error: ${error.message}`);
+      } finally {
+        hideLoading('address');
+      }
+    }
+    
+    // Helper functions
+    function showLoading(prefix) {
+      document.getElementById(`${prefix}-loading`).style.display = 'block';
+    }
+    
+    function hideLoading(prefix) {
+      document.getElementById(`${prefix}-loading`).style.display = 'none';
+    }
+    
+    function showError(prefix, message) {
+      const errorEl = document.getElementById(`${prefix}-error`);
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+    }
+    
+    function hideError(prefix) {
+      document.getElementById(`${prefix}-error`).style.display = 'none';
+    }
+    
+    function showResult(prefix) {
+      document.getElementById(`${prefix}-result`).style.display = 'block';
+    }
+    
+    function hideResult(prefix) {
+      document.getElementById(`${prefix}-result`).style.display = 'none';
+    }
+    
+    // Handle Enter key in input fields
+    document.getElementById('latitude').addEventListener('keyup', event => {
+      if (event.key === 'Enter') {
+        document.getElementById('longitude').focus();
+      }
+    });
+    
+    document.getElementById('longitude').addEventListener('keyup', event => {
+      if (event.key === 'Enter') {
+        geocodeCoordinates();
+      }
+    });
+    
+    document.getElementById('address').addEventListener('keyup', event => {
+      if (event.key === 'Enter') {
+        geocodeAddress();
+      }
+    });
+  </script>
+</body>
+</html>
