@@ -1,0 +1,14 @@
+Assistant checkpoint: Update Tailwind and PostCSS configs to ESM format
+
+Assistant generated file changes:
+- tailwind.config.js: Update Tailwind config to ESM
+- postcss.config.cjs: Update PostCSS config to ESM
+
+---
+
+User prompt:
+
+there is still no preview... Please refresh
+
+Replit-Commit-Author: Assistant
+Replit-Commit-Session-Id: 9ca362b6-b970-4581-ac5f-8dcbfa58d1cb
