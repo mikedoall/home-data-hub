@@ -1,0 +1,99 @@
+// Task: Implement Autocomplete + Caching for Property Broadband Search
+
+// 🔹 FRONTEND TASKS (React / TypeScript)
+// File: client/src/pages/property-search-new.tsx or similar
+
+1. Add Autocomplete Input:
+- Modify the address search input to include debounced autocomplete calls:
+
+```tsx
+import debounce from 'lodash.debounce';
+
+const fetchSuggestions = debounce(async (query: string) => {
+  if (!query) return;
+  const res = await fetch(`/api/autocomplete?q=${encodeURIComponent(query)}`);
+  const data = await res.json();
+  setSuggestions(data.results || []);
+}, 300);
+
+<input
+  type="text"
+  value={searchQuery}
+  onChange={(e) => {
+    setSearchQuery(e.target.value);
+    fetchSuggestions(e.target.value);
+  }}
+/>
+```
+
+2. Display Suggestion Dropdown:
+```tsx
+{suggestions.map((suggestion) => (
+  <div key={suggestion.formatted} onClick={() => handleSelect(suggestion)}>
+    {suggestion.formatted}
+  </div>
+))}
+```
+
+
+// 🔹 BACKEND TASKS (Node.js / Express)
+// File: server/routes.ts or server/autocomplete.ts
+
+3. Add `/api/autocomplete` endpoint using OpenCage:
+```ts
+app.get('/api/autocomplete', async (req, res) => {
+  const { q } = req.query;
+  const apiKey = process.env.OPENCAGE_API_KEY;
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(q)}&key=${apiKey}&limit=5&countrycode=us`;
+
+  try {
+    const response = await fetch(url);
+    const json = await response.json();
+    res.json({ results: json.results });
+  } catch (err) {
+    console.error('Autocomplete failed', err);
+    res.status(500).json({ error: 'Failed to fetch suggestions' });
+  }
+});
+```
+
+
+// 🔹 FCC CACHING (server/fcc-api-service.ts or similar)
+
+4. Modify FCC fetch function to check DB cache first:
+```ts
+async function getFccBroadbandData(geoid) {
+  const cached = await db.fcc_cache.findOne({ where: { geoid } });
+  if (cached) return JSON.parse(cached.broadband_data);
+
+  // fetch from FCC if not cached
+  const data = await fetchFCC(geoid);
+  await db.fcc_cache.create({
+    geoid,
+    broadband_data: JSON.stringify(data),
+    last_fetched: new Date()
+  });
+  return data;
+}
+```
+
+5. Create `fcc_cache` table (SQL):
+```sql
+CREATE TABLE fcc_cache (
+  id SERIAL PRIMARY KEY,
+  geoid TEXT UNIQUE NOT NULL,
+  broadband_data JSONB NOT NULL,
+  last_fetched TIMESTAMP DEFAULT NOW()
+);
+```
+
+
+// 🔹 BONUS: Update property search to call getFccBroadbandData using the geocoded GEOID.
+
+---
+✅ Ask Replit to implement these steps above and verify that:
+- Typing in address triggers OpenCage autocomplete dropdown
+- Searching shows cached FCC data (if GEOID was seen before)
+- New GEOID results are cached on first lookup
+
+Let me know when these are live and I’ll help test the UI polish or map integration next!
