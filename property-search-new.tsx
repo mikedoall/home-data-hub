@@ -1,3 +1,4 @@
+import SmartSearch from "./smart-search";
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -402,7 +403,14 @@ export default function PropertySearchNew() {
       <TypographyP className="mb-6">
         Search for any property by address, city, state, or ZIP code to view detailed information.
       </TypographyP>
-      
+      <TypographyP className="mb-6">
+  Search for any property by address, city, state, or ZIP code to view detailed information.
+</TypographyP>
+
+<SmartSearch />  {/* ✅ Add this line here! */}
+
+{/* Debug test button */}
+
       {/* Debug test button */}
       <div className="bg-gray-100 p-3 mb-4 rounded-md">
         <div className="text-sm font-medium mb-2">Autocomplete API Debug</div>
