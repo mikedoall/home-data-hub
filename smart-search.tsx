@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { searchProperties } from "@/lib/api";
+import { searchProperties } from "./searchProperties"
 import { Property } from "@shared/schema";
 
 const SmartSearch: React.FC = () => {
