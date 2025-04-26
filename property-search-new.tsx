@@ -1,4 +1,12 @@
-import SmartSearch from "./smart-search";
+import SmartSearch from "./smart-search";{showDropdown && (
+  <div className="absolute bg-white border border-gray-300 rounded-md mt-2 w-full max-w-lg z-50">
+    {searchResults.map((property) => (
+      <div key={property.id} className="p-2 hover:bg-gray-100 cursor-pointer">
+        {property.address}, {property.city}, {property.state} {property.zip}
+      </div>
+    ))}
+  </div>
+)}
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
