@@ -34,41 +34,15 @@ export default function PropertySearch() {
 
       setIsSearching(true);
       setErrorMessage('');
-
-      try {
-        console.log('Searching properties with query:', searchQuery);
-        
-        // Make direct API request with fetch to see the raw response
-        const data = await searchProperties(searchQuery);
-        console.log('Raw API response:', data);
-        
-        let searchResults: Property[] = [];
-        
-        // Handle the new API response format
-        if (data && data.success && Array.isArray(data.results)) {
-          console.log('Using results array from API response');
-          searchResults = data.results;
-        } else if (Array.isArray(data)) {
-          // Fallback for old API format
-          console.log('API returned array directly');
-          searchResults = data;
-        } else {
-          console.warn('Unexpected API response format:', data);
-        }
-        
-        console.log('Processed search results:', searchResults);
-        setResults(searchResults);
-        
-        if (searchResults.length === 0) {
-          setErrorMessage('No properties found matching your search criteria');
-        }
-      } catch (error) {
-        console.error('Error searching properties:', error);
-        setErrorMessage('An error occurred while searching. Please try again.');
-      } finally {
-        setIsSearching(false);
-      }
-    };
+try {
+  console.log('Searching properties with query:', searchQuery);
+  const data = await searchProperties(searchQuery);
+  console.log('Raw search results:', data);
+  setResults(data);
+} catch (error) {
+  console.error('Error searching properties:', error);
+  setErrorMessage('Something went wrong. Please try again.');
+}
 
     performSearch();
   }, [searchQuery]);
