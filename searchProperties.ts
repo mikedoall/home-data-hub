@@ -1,8 +1,9 @@
+// searchProperties.ts
+
 export async function searchProperties(term: string) {
   console.log("Mock search running for:", term);
 
-  // Mock data
-  const properties = [
+  const mockData = [
     {
       id: 1,
       address: "123 Main St",
@@ -19,11 +20,11 @@ export async function searchProperties(term: string) {
     },
   ];
 
-  // 🔥 Add this: filter results based on the search term
-  const filtered = properties.filter((property) => {
+  // Filter based on the search term
+  const filtered = mockData.filter((property) => {
     const fullText = `${property.address} ${property.city} ${property.state} ${property.zip}`.toLowerCase();
     return fullText.includes(term.toLowerCase());
   });
 
-  return filtered;
+  return filtered; // 👈 Return the filtered results directly (no fetch, no API)
 }
