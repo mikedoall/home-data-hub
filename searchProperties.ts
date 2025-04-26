@@ -1,7 +1,7 @@
 export async function searchProperties(term: string) {
   console.log("Mock search running for:", term);
 
-  await new Promise(resolve => setTimeout(resolve, 300)); // simulate delay
+  await new Promise(resolve => setTimeout(resolve, 300));
 
   const properties = [
     {
@@ -20,7 +20,6 @@ export async function searchProperties(term: string) {
     }
   ];
 
-  // Filter properties based on search term
   const filtered = properties.filter(property =>
     property.address.toLowerCase().includes(term.toLowerCase()) ||
     property.city.toLowerCase().includes(term.toLowerCase()) ||
@@ -28,6 +27,6 @@ export async function searchProperties(term: string) {
     property.zip.includes(term)
   );
 
-  // 🛠️ Important: Return the results inside an object
-  return filtered;
+  // 🛠️ Wrapped inside { results: [...] }
+  return { results: filtered };
 }
