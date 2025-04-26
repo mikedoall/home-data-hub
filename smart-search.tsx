@@ -3,12 +3,12 @@ import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { searchProperties } from "./searchProperties"
-import { Property } from "@shared/schema";
+import { searchProperties } from "../searchProperties";
+import { Property } from "@/shared/schema";
 
 const SmartSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Property[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [cachedResults, setCachedResults] = useState<Record<string, Property[]>>({});
@@ -30,9 +30,9 @@ const SmartSearch: React.FC = () => {
           try {
             const results = await searchProperties(searchTerm);
             setSearchResults(results);
-            setCachedResults(prev => ({ ...prev, [searchTerm]: results }));
-          } catch (err) {
-            console.error("Search failed:", err);
+            setCachedResults((prev) => ({ ...prev, [searchTerm]: results }));
+          } catch (error) {
+            console.error("Error searching properties:", error);
           }
         }
         setIsLoading(false);
@@ -73,52 +73,29 @@ const SmartSearch: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-xl mx-auto" ref={searchRef}>
-      <form onSubmit={handleSubmit} className="relative">
-        <Input
+    <div className="relative w-full max-w-lg mx-auto" ref={searchRef}>
+      <form onSubmit={handleSubmit} className="flex items-center border rounded px-3 py-2">
+        <Search className="text-gray-500 mr-2" size={20} />
+        <input
           type="text"
-          placeholder="Search by address, city or ZIP"
+          placeholder="Search by address, city, state, or ZIP"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => {
-            if (searchTerm.length >= 3) setShowResults(true);
-          }}
-          className="w-full px-4 py-3 pl-12 rounded-lg border border-gray-300"
+          className="w-full outline-none"
         />
-        <Search className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
-        <Button
-          type="submit"
-          className="absolute right-2 top-2 bg-amber-500 hover:bg-amber-600 text-white"
-          disabled={searchTerm.trim().length < 3}
-        >
-          Search
-        </Button>
       </form>
 
       {showDropdown && (
-        <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
-          {isLoading && (
-            <div className="p-4 text-center text-gray-500">Searching...</div>
-          )}
-          {!isLoading && searchResults.length === 0 && (
-            <div className="p-4 text-center text-gray-500">No properties found</div>
-          )}
-          {!isLoading && searchResults.length > 0 && (
-            <ul className="divide-y divide-gray-200">
-              {searchResults.map((property) => (
-                <li
-                  key={property.id}
-                  className="p-3 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleSelect(property.id)}
-                >
-                  <div className="font-medium">{property.address}</div>
-                  <div className="text-sm text-gray-500">
-                    {property.city}, {property.state} {property.zip}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="absolute left-0 right-0 bg-white border border-gray-300 rounded-md mt-2 w-full z-50">
+          {searchResults.map((property) => (
+            <div
+              key={property.id}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() => handleSelect(property.id)}
+            >
+              {property.address}, {property.city}, {property.state} {property.zip}
+            </div>
+          ))}
         </div>
       )}
     </div>
