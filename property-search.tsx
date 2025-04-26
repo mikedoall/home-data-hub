@@ -39,8 +39,7 @@ export default function PropertySearch() {
         console.log('Searching properties with query:', searchQuery);
         
         // Make direct API request with fetch to see the raw response
-        const response = await fetch(`/api/properties/search?q=${encodeURIComponent(searchQuery)}`);
-        const data = await response.json();
+        const data = await searchProperties(searchQuery);
         console.log('Raw API response:', data);
         
         let searchResults: Property[] = [];
