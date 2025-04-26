@@ -8,7 +8,7 @@ import { Property } from "@shared/schema";
 
 const SmartSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Property[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [cachedResults, setCachedResults] = useState<Record<string, Property[]>>({});
