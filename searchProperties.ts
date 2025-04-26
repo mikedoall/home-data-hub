@@ -1,7 +1,8 @@
 export async function searchProperties(term: string) {
   console.log("Mock search running for:", term);
 
-  // This is mock data for now (just so it works)
+  await new Promise(resolve => setTimeout(resolve, 300)); // ⬅️ <-- Add tiny fake delay
+
   return [
     {
       id: 1,
