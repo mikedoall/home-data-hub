@@ -30,21 +30,24 @@ export default function PropertySearch() {
   // Perform search when searchQuery changes
   useEffect(() => {
     const performSearch = async () => {
-      if (!searchQuery || searchQuery.length < 2) return;
+  if (!searchQuery || searchQuery.length < 2) return;
 
-      setIsSearching(true);
-      setErrorMessage('');
-try {
-  console.log('Searching properties with query:', searchQuery);
-  const data = await searchProperties(searchQuery);
-  console.log('Raw search results:', data);
-  setResults(data);
-} catch (error) {
-  console.error('Error searching properties:', error);
-  setErrorMessage('Something went wrong. Please try again.');
-}
+  setIsSearching(true);
+  setErrorMessage('');
 
-    performSearch();
+  try {
+    console.log('Searching properties with query:', searchQuery);
+    const data = await searchProperties(searchQuery);
+    console.log('Raw search results:', data);
+    setResults(data);
+  } catch (error) {
+    console.error('Error searching properties:', error);
+    setErrorMessage('Something went wrong. Please try again.');
+  } finally {
+    setIsSearching(false);
+  }
+};
+
   }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
